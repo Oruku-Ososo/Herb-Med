@@ -12,7 +12,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { BlurView } from 'expo-blur';
-import { Heart, ArrowLeft, CheckCircle2, AlertTriangle, Info, Share2 } from 'lucide-react-native';
+import { Heart, ArrowLeft, CheckCircle2, AlertTriangle, Info, Share2, Beaker } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/Colors';
 import { HERBS } from '@/constants/Herbs';
@@ -118,6 +118,16 @@ export default function HerbDetailScreen() {
             </View>
             <Text style={[styles.sectionBody, { color: colors.text }]}>{herb.usage}</Text>
           </View>
+
+          {herb.scientificBacking && (
+            <View style={[styles.section, { backgroundColor: '#F0F9FF', borderColor: '#BAE6FD', borderWidth: 1 }]}>
+              <View style={styles.sectionHeader}>
+                <Beaker size={20} color="#0284C7" />
+                <Text style={[styles.sectionTitle, { color: '#0369A1' }]}>Scientific Backing</Text>
+              </View>
+              <Text style={[styles.sectionBody, { color: '#075985' }]}>{herb.scientificBacking}</Text>
+            </View>
+          )}
 
           <View style={[styles.section, { backgroundColor: '#FFF5F5', borderColor: '#FED7D7', borderWidth: 1 }]}>
             <View style={styles.sectionHeader}>
