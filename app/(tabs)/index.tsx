@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -22,12 +22,26 @@ export default function HomeScreen() {
   const colors = Colors[colorScheme];
   const insets = useSafeAreaInsets();
 
-  const categories = ['All', 'Anti-inflammatory', 'Digestive', 'Calming', 'Energy', 'Immune Support', 'Adaptogen'];
-  const featuredHerbs = HERBS.slice(0, 4);
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const handleCategoryPress = () => {
+  const categories = ['All', 'Anti-inflammatory', 'Digestive', 'Calming', 'Energy', 'Immune Support', 'Adaptogen'];
+
+  const featuredHerbs = selectedCategory === 'All'
+    ? HERBS.slice(0, 4)
+    : HERBS.filter(herb => herb.category === selectedCategory);
+
+  const handleCategoryPress = (category: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedCategory(category);
   };
+
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now.getTime() - start.getTime();
+  const oneDay = 1000 * 60 * 60 * 24;
+  const dayOfYear = Math.floor(diff / oneDay);
+
+  const herbOfTheDay = HERBS[dayOfYear % HERBS.length];
 
   return (
     <ScrollView
@@ -57,15 +71,22 @@ export default function HomeScreen() {
       </Link>
 
       <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: 0, paddingHorizontal: 0 }]}>Herb of the Day</Text>
+        </View>
+        <HerbCard herb={herbOfTheDay} style={{ marginHorizontal: 20 }} />
+      </View>
+
+      <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Categories</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll} contentContainerStyle={{ paddingRight: 20 }}>
           {categories.map((category) => (
             <TouchableOpacity
               key={category}
-              onPress={handleCategoryPress}
-              style={[styles.categoryBadge, { backgroundColor: category === 'All' ? colors.tint : colors.cardBackground, borderColor: colors.border }]}
+              onPress={() => handleCategoryPress(category)}
+              style={[styles.categoryBadge, { backgroundColor: category === selectedCategory ? colors.tint : colors.cardBackground, borderColor: colors.border }]}
             >
-              <Text style={[styles.categoryText, { color: category === 'All' ? '#FFF' : colors.text }]}>{category}</Text>
+              <Text style={[styles.categoryText, { color: category === selectedCategory ? '#FFF' : colors.text }]}>{category}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -73,10 +94,14 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Featured Herbs</Text>
-          <TouchableOpacity>
-            <Text style={[styles.seeAll, { color: colors.tint }]}>See All</Text>
-          </TouchableOpacity>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            {selectedCategory === 'All' ? 'Featured Herbs' : `${selectedCategory} Herbs`}
+          </Text>
+          {selectedCategory === 'All' && (
+            <TouchableOpacity>
+              <Text style={[styles.seeAll, { color: colors.tint }]}>See All</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {featuredHerbs.map((herb) => (
