@@ -7,8 +7,9 @@ import {
   FlatList,
   useColorScheme,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
-import { Search as SearchIcon } from 'lucide-react-native';
+import { Search as SearchIcon, XCircle } from 'lucide-react-native';
 import Colors from '@/constants/Colors';
 import { HERBS } from '@/constants/Herbs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -39,6 +40,11 @@ export default function SearchScreen() {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <XCircle size={20} color={colors.secondaryText} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 

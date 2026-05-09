@@ -1,10 +1,12 @@
 import React from 'react';
 import { TouchableOpacity, Text, View, StyleSheet, useColorScheme, ViewStyle, StyleProp } from 'react-native';
 import { Image } from 'expo-image';
-import { ChevronRight, Leaf } from 'lucide-react-native';
+import { ChevronRight, Leaf, Heart } from 'lucide-react-native';
 import { Link } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/Colors';
 import { Herb } from '@/constants/Herbs';
+import { useHerbStore } from '@/store/useHerbStore';
 
 interface HerbCardProps {
   herb: Herb;
@@ -14,6 +16,14 @@ interface HerbCardProps {
 export function HerbCard({ herb, style }: HerbCardProps) {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
+  const { toggleFavorite, isFavorite } = useHerbStore();
+
+  const favorite = isFavorite(herb.id);
+
+  const handleToggleFavorite = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    toggleFavorite(herb.id);
+  };
 
   return (
     <Link href={`/herb/${herb.id}`} asChild>
@@ -27,6 +37,9 @@ export function HerbCard({ herb, style }: HerbCardProps) {
             <Text style={[styles.herbCategory, { color: colors.tint }]}>{herb.category}</Text>
           </View>
         </View>
+        <TouchableOpacity onPress={handleToggleFavorite} style={styles.favoriteButton}>
+          <Heart size={20} color={favorite ? colors.error : colors.secondaryText} fill={favorite ? colors.error : "transparent"} />
+        </TouchableOpacity>
         <ChevronRight size={20} color={colors.secondaryText} />
       </TouchableOpacity>
     </Link>
@@ -68,5 +81,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 4,
+  },
+  favoriteButton: {
+    padding: 8,
+    marginRight: 4,
   },
 });
