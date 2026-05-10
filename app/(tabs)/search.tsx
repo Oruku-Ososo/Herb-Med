@@ -27,13 +27,18 @@ export default function SearchScreen() {
       herb.scientificName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const containerStyle = StyleSheet.flatten([
+    styles.container,
+    { backgroundColor: colors.background, paddingTop: Platform.OS === 'ios' ? insets.top + 60 : 20 }
+  ]);
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background, paddingTop: Platform.OS === 'ios' ? insets.top + 60 : 20 }]}>
+    <View style={containerStyle}>
       <View style={styles.searchContainer}>
-        <View style={[styles.searchBar, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+        <View style={StyleSheet.flatten([styles.searchBar, { backgroundColor: colors.cardBackground, borderColor: colors.border }])}>
           <SearchIcon size={20} color={colors.secondaryText} />
           <TextInput
-            style={[styles.input, { color: colors.text }]}
+            style={StyleSheet.flatten([styles.input, { color: colors.text }])}
             placeholder="Search herbs..."
             placeholderTextColor={colors.secondaryText}
             value={searchQuery}
@@ -48,7 +53,7 @@ export default function SearchScreen() {
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={[styles.emptyText, { color: colors.secondaryText }]}>No herbs found matching your search.</Text>
+            <Text style={StyleSheet.flatten([styles.emptyText, { color: colors.secondaryText }])}>No herbs found matching your search.</Text>
           </View>
         }
         renderItem={({ item }) => <HerbCard herb={item} />}

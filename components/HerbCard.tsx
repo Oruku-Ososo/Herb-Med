@@ -15,9 +15,15 @@ export function HerbCard({ herb, style }: HerbCardProps) {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
 
+  const flattenedStyle = StyleSheet.flatten([
+    styles.herbCard,
+    { backgroundColor: colors.cardBackground, borderColor: colors.border },
+    style
+  ]);
+
   return (
     <Link href={`/herb/${herb.id}`} asChild>
-      <TouchableOpacity style={[styles.herbCard, { backgroundColor: colors.cardBackground, borderColor: colors.border }, style]}>
+      <TouchableOpacity style={flattenedStyle}>
         <Image source={{ uri: herb.image }} style={styles.herbThumb} contentFit="cover" transition={200} />
         <View style={styles.herbInfo}>
           <Text style={[styles.herbName, { color: colors.text }]}>{herb.name}</Text>

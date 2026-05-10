@@ -32,14 +32,16 @@ export default function HerbDetailScreen() {
 
   if (!herb) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
         <Text style={{ color: colors.text }}>Herb not found</Text>
       </View>
     );
   }
 
   const handleToggleFavorite = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    if (Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
     toggleFavorite(herb.id);
   };
 
@@ -54,31 +56,49 @@ export default function HerbDetailScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
         <View style={styles.imageContainer}>
           <Image source={{ uri: herb.image }} style={styles.heroImage} contentFit="cover" />
           {Platform.OS === 'ios' && (
-            <BlurView intensity={20} tint="dark" style={styles.imageOverlay} />
+            <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
           )}
           <TouchableOpacity
             style={[styles.backButton, { top: insets.top + 10 }]}
             onPress={() => router.back()}
           >
-            <BlurView intensity={80} tint="light" style={styles.iconBlur}>
-              <ArrowLeft size={24} color="#000" />
-            </BlurView>
+            {Platform.OS === 'ios' ? (
+              <BlurView intensity={80} tint="light" style={styles.iconBlur}>
+                <ArrowLeft size={24} color="#000" />
+              </BlurView>
+            ) : (
+              <View style={[styles.iconBlur, { backgroundColor: 'rgba(255,255,255,0.8)' }]}>
+                <ArrowLeft size={24} color="#000" />
+              </View>
+            )}
           </TouchableOpacity>
           <View style={[styles.rightButtons, { top: insets.top + 10 }]}>
             <TouchableOpacity onPress={handleShare} style={{ marginRight: 10 }}>
-              <BlurView intensity={80} tint="light" style={styles.iconBlur}>
-                <Share2 size={24} color="#000" />
-              </BlurView>
+              {Platform.OS === 'ios' ? (
+                <BlurView intensity={80} tint="light" style={styles.iconBlur}>
+                  <Share2 size={24} color="#000" />
+                </BlurView>
+              ) : (
+                <View style={[styles.iconBlur, { backgroundColor: 'rgba(255,255,255,0.8)' }]}>
+                  <Share2 size={24} color="#000" />
+                </View>
+              )}
             </TouchableOpacity>
             <TouchableOpacity onPress={handleToggleFavorite}>
-              <BlurView intensity={80} tint="light" style={styles.iconBlur}>
-                <Heart size={24} color={favorite ? colors.error : "#000"} fill={favorite ? colors.error : "transparent"} />
-              </BlurView>
+              {Platform.OS === 'ios' ? (
+                <BlurView intensity={80} tint="light" style={styles.iconBlur}>
+                  <Heart size={24} color={favorite ? colors.error : "#000"} fill={favorite ? colors.error : "transparent"} />
+                </BlurView>
+              ) : (
+                <View style={[styles.iconBlur, { backgroundColor: 'rgba(255,255,255,0.8)' }]}>
+                  <Heart size={24} color={favorite ? colors.error : "#000"} fill={favorite ? colors.error : "transparent"} />
+                </View>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -90,7 +110,7 @@ export default function HerbDetailScreen() {
             <Text style={[styles.scientificName, { color: colors.secondaryText }]}>{herb.scientificName}</Text>
           </View>
 
-          <View style={[styles.section, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+          <View style={StyleSheet.flatten([styles.section, { backgroundColor: colors.cardBackground, borderColor: colors.border }])}>
             <View style={styles.sectionHeader}>
               <Info size={20} color={colors.tint} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Description</Text>
@@ -98,7 +118,7 @@ export default function HerbDetailScreen() {
             <Text style={[styles.sectionBody, { color: colors.text }]}>{herb.description}</Text>
           </View>
 
-          <View style={[styles.section, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+          <View style={StyleSheet.flatten([styles.section, { backgroundColor: colors.cardBackground, borderColor: colors.border }])}>
             <View style={styles.sectionHeader}>
               <CheckCircle2 size={20} color={colors.tint} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Health Benefits</Text>
@@ -111,16 +131,16 @@ export default function HerbDetailScreen() {
             ))}
           </View>
 
-          <View style={[styles.section, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+          <View style={StyleSheet.flatten([styles.section, { backgroundColor: colors.cardBackground, borderColor: colors.border }])}>
             <View style={styles.sectionHeader}>
-              <Leaf size={20} color={colors.tint} />
+              <LeafIcon size={20} color={colors.tint} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>How to Use</Text>
             </View>
             <Text style={[styles.sectionBody, { color: colors.text }]}>{herb.usage}</Text>
           </View>
 
           {herb.scientificBacking && (
-            <View style={[styles.section, { backgroundColor: '#F0F9FF', borderColor: '#BAE6FD', borderWidth: 1 }]}>
+            <View style={StyleSheet.flatten([styles.section, { backgroundColor: '#F0F9FF', borderColor: '#BAE6FD', borderWidth: 1 }])}>
               <View style={styles.sectionHeader}>
                 <Beaker size={20} color="#0284C7" />
                 <Text style={[styles.sectionTitle, { color: '#0369A1' }]}>Scientific Backing</Text>
@@ -129,7 +149,7 @@ export default function HerbDetailScreen() {
             </View>
           )}
 
-          <View style={[styles.section, { backgroundColor: '#FFF5F5', borderColor: '#FED7D7', borderWidth: 1 }]}>
+          <View style={StyleSheet.flatten([styles.section, { backgroundColor: '#FFF5F5', borderColor: '#FED7D7', borderWidth: 1 }])}>
             <View style={styles.sectionHeader}>
               <AlertTriangle size={20} color="#E53E3E" />
               <Text style={[styles.sectionTitle, { color: '#C53030' }]}>Precautions</Text>
@@ -142,7 +162,7 @@ export default function HerbDetailScreen() {
   );
 }
 
-const Leaf = ({ size, color }: { size: number, color: string }) => (
+const LeafIcon = ({ size, color }: { size: number, color: string }) => (
   <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
     <View style={{ width: size * 0.8, height: size * 0.8, borderRadius: size * 0.4, backgroundColor: color, opacity: 0.2, position: 'absolute' }} />
     <View style={{ width: size * 0.4, height: size * 0.4, borderRadius: size * 0.1, backgroundColor: color }} />
@@ -150,9 +170,6 @@ const Leaf = ({ size, color }: { size: number, color: string }) => (
 );
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   imageContainer: {
     height: 400,
     position: 'relative',
@@ -160,9 +177,6 @@ const styles = StyleSheet.create({
   heroImage: {
     width: '100%',
     height: '100%',
-  },
-  imageOverlay: {
-    ...StyleSheet.absoluteFillObject,
   },
   backButton: {
     position: 'absolute',

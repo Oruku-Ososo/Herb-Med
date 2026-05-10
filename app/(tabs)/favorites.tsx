@@ -24,17 +24,22 @@ export default function FavoritesScreen() {
 
   const favoriteHerbs = HERBS.filter((herb) => favorites.includes(herb.id));
 
+  const containerStyle = StyleSheet.flatten([
+    styles.container,
+    { backgroundColor: colors.background, paddingTop: Platform.OS === 'ios' ? insets.top + 60 : 20 }
+  ]);
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background, paddingTop: Platform.OS === 'ios' ? insets.top + 60 : 20 }]}>
+    <View style={containerStyle}>
       {favoriteHerbs.length === 0 ? (
         <View style={styles.emptyState}>
           <Heart size={64} color={colors.border} fill={colors.border} />
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>No Favorites Yet</Text>
-          <Text style={[styles.emptyText, { color: colors.secondaryText }]}>
+          <Text style={StyleSheet.flatten([styles.emptyTitle, { color: colors.text }])}>No Favorites Yet</Text>
+          <Text style={StyleSheet.flatten([styles.emptyText, { color: colors.secondaryText }])}>
             Herbs you heart will appear here for quick access.
           </Text>
           <Link href="/(tabs)/search" asChild>
-            <TouchableOpacity style={[styles.browseButton, { backgroundColor: colors.tint }]}>
+            <TouchableOpacity style={StyleSheet.flatten([styles.browseButton, { backgroundColor: colors.tint }])}>
               <Text style={styles.browseButtonText}>Browse Herbs</Text>
             </TouchableOpacity>
           </Link>

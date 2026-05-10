@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Platform, useColorScheme } from 'react-native';
+import { Platform, useColorScheme, View } from 'react-native';
 import { Home, Search, Heart } from 'lucide-react-native';
 import * as AppleSymbols from 'expo-symbols';
 import { BlurView } from 'expo-blur';
@@ -44,12 +44,12 @@ export default function TabLayout() {
         tabBarBackground: () =>
           Platform.OS === 'ios' ? (
             <BlurView intensity={80} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} tint={colorScheme} />
-          ) : undefined,
+          ) : <View />,
         headerTransparent: Platform.OS === 'ios',
         headerBackground: () =>
           Platform.OS === 'ios' ? (
             <BlurView intensity={80} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} tint={colorScheme} />
-          ) : undefined,
+          ) : <View />,
         headerTitleStyle: {
           color: Colors[colorScheme].text,
           fontWeight: '700',

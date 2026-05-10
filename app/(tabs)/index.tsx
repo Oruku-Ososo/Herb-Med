@@ -26,19 +26,26 @@ export default function HomeScreen() {
   const featuredHerbs = HERBS.slice(0, 4);
 
   const handleCategoryPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
   };
+
+  const containerStyle = StyleSheet.flatten([
+    styles.container,
+    { backgroundColor: colors.background }
+  ]);
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={containerStyle}
       contentContainerStyle={{ paddingTop: Platform.OS === 'ios' ? insets.top + 60 : 20, paddingBottom: 100 }}
       showsVerticalScrollIndicator={false}
     >
       {Platform.OS === 'ios' && (
         <LinearGradient
           colors={[colors.tint + '20', 'transparent']}
-          style={styles.gradient}
+          style={StyleSheet.flatten([styles.gradient, { height: 300 }])}
         />
       )}
       <View style={styles.header}>
@@ -48,8 +55,12 @@ export default function HomeScreen() {
 
       <Link href="/(tabs)/search" asChild>
         <TouchableOpacity
-          style={[styles.searchBar, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
-          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+          style={StyleSheet.flatten([styles.searchBar, { backgroundColor: colors.cardBackground, borderColor: colors.border }])}
+          onPress={() => {
+            if (Platform.OS !== 'web') {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }
+          }}
         >
           <Search size={20} color={colors.secondaryText} />
           <Text style={[styles.searchText, { color: colors.secondaryText }]}>Search for herbs, benefits...</Text>
@@ -63,7 +74,7 @@ export default function HomeScreen() {
             <TouchableOpacity
               key={category}
               onPress={handleCategoryPress}
-              style={[styles.categoryBadge, { backgroundColor: category === 'All' ? colors.tint : colors.cardBackground, borderColor: colors.border }]}
+              style={StyleSheet.flatten([styles.categoryBadge, { backgroundColor: category === 'All' ? colors.tint : colors.cardBackground, borderColor: colors.border }])}
             >
               <Text style={[styles.categoryText, { color: category === 'All' ? '#FFF' : colors.text }]}>{category}</Text>
             </TouchableOpacity>
@@ -96,7 +107,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 300,
   },
   header: {
     paddingHorizontal: 20,
