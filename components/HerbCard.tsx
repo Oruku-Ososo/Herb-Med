@@ -17,8 +17,13 @@ export function HerbCard({ herb, style }: HerbCardProps) {
 
   return (
     <Link href={`/herb/${herb.id}`} asChild>
-      <TouchableOpacity style={[styles.herbCard, { backgroundColor: colors.cardBackground, borderColor: colors.border }, style]}>
-        <Image source={{ uri: herb.image }} style={styles.herbThumb} contentFit="cover" transition={200} />
+      <TouchableOpacity
+        style={[styles.herbCard, { backgroundColor: colors.cardBackground, borderColor: colors.border }, style]}
+        accessibilityRole="button"
+        accessibilityLabel={`${herb.name}, ${herb.scientificName}, ${herb.category} category`}
+        accessibilityHint={`Tap to view details for ${herb.name}`}
+      >
+        <Image source={{ uri: herb.image }} style={styles.herbThumb} contentFit="cover" transition={200} accessibilityIgnoresInvertColors />
         <View style={styles.herbInfo}>
           <Text style={[styles.herbName, { color: colors.text }]}>{herb.name}</Text>
           <Text style={[styles.herbScientific, { color: colors.secondaryText }]}>{herb.scientificName}</Text>

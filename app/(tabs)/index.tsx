@@ -13,17 +13,28 @@ import { Search } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/Colors';
-import { HERBS } from '@/constants/Herbs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HerbCard } from '@/components/HerbCard';
+import { useHerbsData } from '@/store/useHerbsData';
+import { useTranslation } from 'react-i18next';
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const insets = useSafeAreaInsets();
+  const { data: herbs = [], isLoading } = useHerbsData();
 
-  const categories = ['All', 'Anti-inflammatory', 'Digestive', 'Calming', 'Energy', 'Immune Support', 'Adaptogen'];
-  const featuredHerbs = HERBS.slice(0, 4);
+  const categories = [
+    { key: 'All', tKey: 'cat_all' },
+    { key: 'Anti-inflammatory', tKey: 'cat_antiInflammatory' },
+    { key: 'Digestive', tKey: 'cat_digestive' },
+    { key: 'Calming', tKey: 'cat_calming' },
+    { key: 'Energy', tKey: 'cat_energy' },
+    { key: 'Immune Support', tKey: 'cat_immuneSupport' },
+    { key: 'Adaptogen', tKey: 'cat_adaptogen' }
+  ];
+  const featuredHerbs = herbs.slice(0, 4);
 
   const handleCategoryPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -42,30 +53,34 @@ export default function HomeScreen() {
         />
       )}
       <View style={styles.header}>
-        <Text style={[styles.greeting, { color: colors.secondaryText }]}>Welcome to</Text>
-        <Text style={[styles.title, { color: colors.text }]}>Herbal Wisdom</Text>
+        <Text style={[styles.greeting, { color: colors.secondaryText }]}>{t('welcome')}</Text>
+        <Text style={[styles.title, { color: colors.text }]} accessibilityRole="header">{t('title')}</Text>
       </View>
 
       <Link href="/(tabs)/search" asChild>
         <TouchableOpacity
           style={[styles.searchBar, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
           onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+          accessibilityRole="search"
+          accessibilityLabel={t('searchPlaceholder')}
         >
           <Search size={20} color={colors.secondaryText} />
-          <Text style={[styles.searchText, { color: colors.secondaryText }]}>Search for herbs, benefits...</Text>
+          <Text style={[styles.searchText, { color: colors.secondaryText }]}>{t('searchPlaceholder')}</Text>
         </TouchableOpacity>
       </Link>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Categories</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll} contentContainerStyle={{ paddingRight: 20 }}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('categories')}</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll} contentContainerStyle={{ paddingRight: 20 }} accessibilityRole="list">
           {categories.map((category) => (
             <TouchableOpacity
-              key={category}
+              key={category.key}
               onPress={handleCategoryPress}
-              style={[styles.categoryBadge, { backgroundColor: category === 'All' ? colors.tint : colors.cardBackground, borderColor: colors.border }]}
+              style={[styles.categoryBadge, { backgroundColor: category.key === 'All' ? colors.tint : colors.cardBackground, borderColor: colors.border }]}
+              accessibilityRole="button"
+              accessibilityLabel={`Category ${t(category.tKey)}`}
             >
-              <Text style={[styles.categoryText, { color: category === 'All' ? '#FFF' : colors.text }]}>{category}</Text>
+              <Text style={[styles.categoryText, { color: category.key === 'All' ? '#FFF' : colors.text }]}>{t(category.tKey)}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -73,15 +88,21 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Featured Herbs</Text>
-          <TouchableOpacity>
-            <Text style={[styles.seeAll, { color: colors.tint }]}>See All</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('featuredHerbs')}</Text>
+          <TouchableOpacity accessibilityRole="button">
+            <Text style={[styles.seeAll, { color: colors.tint }]}>{t('seeAll')}</Text>
           </TouchableOpacity>
         </View>
 
-        {featuredHerbs.map((herb) => (
-          <HerbCard key={herb.id} herb={herb} style={{ marginHorizontal: 20 }} />
-        ))}
+        {isLoading ? (
+          <View style={{ padding: 20, alignItems: 'center' }}>
+            <Text style={{ color: colors.secondaryText }}>Loading herbs...</Text>
+          </View>
+        ) : (
+          featuredHerbs.map((herb) => (
+            <HerbCard key={herb.id} herb={herb} style={{ marginHorizontal: 20 }} />
+          ))
+        )}
       </View>
     </ScrollView>
   );

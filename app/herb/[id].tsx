@@ -15,25 +15,36 @@ import { BlurView } from 'expo-blur';
 import { Heart, ArrowLeft, CheckCircle2, AlertTriangle, Info, Share2 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/Colors';
-import { HERBS } from '@/constants/Herbs';
 import { useHerbStore } from '@/store/useHerbStore';
+import { useHerbsData } from '@/store/useHerbsData';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 export default function HerbDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const insets = useSafeAreaInsets();
   const { toggleFavorite, isFavorite } = useHerbStore();
+  const { data: herbs = [], isLoading } = useHerbsData();
 
-  const herb = HERBS.find((h) => h.id === id);
+  const herb = herbs.find((h) => h.id === id);
   const favorite = herb ? isFavorite(herb.id) : false;
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ color: colors.text }}>Loading herb details...</Text>
+      </View>
+    );
+  }
 
   if (!herb) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={{ color: colors.text }}>Herb not found</Text>
+        <Text style={{ color: colors.text }}>{t('herbNotFound')}</Text>
       </View>
     );
   }
@@ -93,7 +104,7 @@ export default function HerbDetailScreen() {
           <View style={[styles.section, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
             <View style={styles.sectionHeader}>
               <Info size={20} color={colors.tint} />
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Description</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]} accessibilityRole="header">{t('description')}</Text>
             </View>
             <Text style={[styles.sectionBody, { color: colors.text }]}>{herb.description}</Text>
           </View>
@@ -101,7 +112,7 @@ export default function HerbDetailScreen() {
           <View style={[styles.section, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
             <View style={styles.sectionHeader}>
               <CheckCircle2 size={20} color={colors.tint} />
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Health Benefits</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]} accessibilityRole="header">{t('healthBenefits')}</Text>
             </View>
             {herb.benefits.map((benefit, index) => (
               <View key={index} style={styles.benefitItem}>
@@ -114,7 +125,7 @@ export default function HerbDetailScreen() {
           <View style={[styles.section, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
             <View style={styles.sectionHeader}>
               <Leaf size={20} color={colors.tint} />
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>How to Use</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]} accessibilityRole="header">{t('howToUse')}</Text>
             </View>
             <Text style={[styles.sectionBody, { color: colors.text }]}>{herb.usage}</Text>
           </View>
@@ -122,7 +133,7 @@ export default function HerbDetailScreen() {
           <View style={[styles.section, { backgroundColor: '#FFF5F5', borderColor: '#FED7D7', borderWidth: 1 }]}>
             <View style={styles.sectionHeader}>
               <AlertTriangle size={20} color="#E53E3E" />
-              <Text style={[styles.sectionTitle, { color: '#C53030' }]}>Precautions</Text>
+              <Text style={[styles.sectionTitle, { color: '#C53030' }]} accessibilityRole="header">{t('precautions')}</Text>
             </View>
             <Text style={[styles.sectionBody, { color: '#742A2A' }]}>{herb.precautions}</Text>
           </View>

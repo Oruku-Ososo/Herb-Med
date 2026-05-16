@@ -1,31 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
-  FlatList,
   useColorScheme,
   Platform,
 } from 'react-native';
 import { Search as SearchIcon } from 'lucide-react-native';
 import Colors from '@/constants/Colors';
-import { HERBS } from '@/constants/Herbs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HerbCard } from '@/components/HerbCard';
+import { useTranslation } from 'react-i18next';
+import { useHerbsData } from '@/store/useHerbsData';
+import { FlashList } from '@shopify/flash-list';
+import Fuse from 'fuse.js';
 
 export default function SearchScreen() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const insets = useSafeAreaInsets();
+  const { data: herbs = [], isLoading } = useHerbsData();
 
-  const filteredHerbs = HERBS.filter(
-    (herb) =>
-      herb.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      herb.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      herb.scientificName.toLowerCase().includes(searchQuery.toLowerCase())
+  const fuse = useMemo(
+    () =>
+      new Fuse(herbs, {
+        keys: ['name', 'category', 'scientificName', 'benefits'],
+        threshold: 0.3,
+      }),
+    [herbs]
   );
+
+  const filteredHerbs = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return herbs;
+    }
+    return fuse.search(searchQuery).map((result) => result.item);
+  }, [searchQuery, fuse, herbs]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background, paddingTop: Platform.OS === 'ios' ? insets.top + 60 : 20 }]}>
@@ -34,25 +47,34 @@ export default function SearchScreen() {
           <SearchIcon size={20} color={colors.secondaryText} />
           <TextInput
             style={[styles.input, { color: colors.text }]}
-            placeholder="Search herbs..."
+            placeholder={t('searchPlaceholderShort')}
             placeholderTextColor={colors.secondaryText}
             value={searchQuery}
             onChangeText={setSearchQuery}
+            accessibilityRole="search"
+            accessibilityLabel={t('searchPlaceholderShort')}
           />
         </View>
       </View>
 
-      <FlatList
-        data={filteredHerbs}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Text style={[styles.emptyText, { color: colors.secondaryText }]}>No herbs found matching your search.</Text>
-          </View>
-        }
-        renderItem={({ item }) => <HerbCard herb={item} />}
-      />
+      {isLoading ? (
+        <View style={styles.emptyState}>
+          <Text style={[styles.emptyText, { color: colors.secondaryText }]}>Loading herbs...</Text>
+        </View>
+      ) : (
+        <FlashList
+          data={filteredHerbs}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          estimatedItemSize={98}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Text style={[styles.emptyText, { color: colors.secondaryText }]}>{t('noHerbsFound')}</Text>
+            </View>
+          }
+          renderItem={({ item }) => <HerbCard herb={item} />}
+        />
+      )}
     </View>
   );
 }
